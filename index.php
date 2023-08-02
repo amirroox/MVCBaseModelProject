@@ -1,6 +1,6 @@
 <?php
 include "Bootstrap/init.php";
 
-var_dump($_ENV);
+echo site_url("jojo/coo");
 
 
