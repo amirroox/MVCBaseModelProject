@@ -1,8 +1,8 @@
 <?php
-const BATH_PATH = __DIR__ . "/../";
-include BATH_PATH . "vendor/autoload.php";
+const BASEPATH = __DIR__ . "/../";
+include BASEPATH . "vendor/autoload.php";
 
-$dotenv = Dotenv\Dotenv::createImmutable(BATH_PATH);
+$dotenv = Dotenv\Dotenv::createImmutable(BASEPATH);
 $dotenv->load();
 
-include BATH_PATH . "helpers/helper.php";
+include BASEPATH . "helpers/helper.php";
