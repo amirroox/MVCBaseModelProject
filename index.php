@@ -1,6 +1,6 @@
 <?php
-include "vendor/autoload.php";
+include "Bootstrap/init.php";
 
-echo $_SERVER["REQUEST_URI"] . "<hr>";
+var_dump($_ENV);
 
 
