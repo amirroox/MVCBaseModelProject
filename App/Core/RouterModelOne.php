@@ -3,12 +3,13 @@ namespace App\Core;
 
 use App\Utilities\UrlTools;
 
-class Router
+class RouterModelOne
 {
     private array $routes;
     public function __construct()
     {
         $this->routes = [
+          "/" => "home/index.php",
           "/text/one" => "test/one.html",
           "/text/two" => "test/two.html"
         ];

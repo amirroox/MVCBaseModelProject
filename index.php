@@ -1,12 +1,9 @@
 <?php
+
+use App\Core\Routing\Router;
+use App\Core\Routing\Routs;
+
 include "Bootstrap/init.php";
 
-use App\Core\Router;
-use App\Core\Request;
-
-$route = new Router();
-//$route->run();
-
-$req = new Request();
-
-
+$router = new Router;
+$router->run();
