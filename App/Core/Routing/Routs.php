@@ -10,6 +10,10 @@ class Routs{
         }
         $method = is_array($method) ? $method : [$method];
         $method = array_map("strtoupper", $method); // To UpperCase
+        if(strpos($url, '{') and strpos($url, '}')){
+            // '/post/{slug}' ==> /^\/post\/(?<slug>[-%\w]+)$/
+            $url = '/^' . str_replace(['/', '{', '}'], ['\/', '(?<', '>[-%\w]+)'], $url) . '$/';
+        }
         self::$routs[] = ["method" => $method ,"url" => $url, "func" => $func, "middleware" => $Middleware ];
     }
 

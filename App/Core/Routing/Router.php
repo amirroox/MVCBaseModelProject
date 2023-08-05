@@ -1,21 +1,24 @@
 <?php
+
 namespace App\Core\Routing;
 
 use App\Core\Request;
 use App\Middleware\GlobalMiddle\BlockGlobal;
 use Exception;
 
-class Router{
-    private array $allRotes;    // All Rotes In Project
-    private Request $request;   // Request Users
-    private $current_uri;       // Current URI For User
-    const HOME_CONTROLLER = "App\Controller\\" ;
+class Router
+{
+    private array $allRotes;        // All Rotes In Project
+    private Request $request;       // Request Users
+    private $current_uri;           // Current URI For User
+    private array $passed = [];    // Passed Method Controller
+    const HOME_CONTROLLER = "App\Controller\\";
 
     public function __construct()
     {
         $this->request = new Request();
         $this->allRotes = Routs::getRouts();
-        $this->current_uri = $this->findRoute($this->request) ?? null ;
+        $this->current_uri = $this->findRoute($this->request) ?? null;
         # MiddleWare Handler
         $this->global_middleware();
         $this->middleware_current_uri($this->current_uri['middleware'] ?? []);
@@ -23,10 +26,9 @@ class Router{
 
     private function findRoute(Request $request)
     {
-        foreach ($this->allRotes as $route)
-        {
+        foreach ($this->allRotes as $route) {
             # Excited Route
-            if(in_array($request->getMethod(), $route["method"]) && $request->getUri() == $route['url']){
+            if ($request->getUri() == $route["url"] || $this->check_regex($route["url"])) {
                 return $route;
             }
         }
@@ -34,36 +36,40 @@ class Router{
         return null;
     }
 
+    private function check_regex($pattern): bool
+    {
+        if (strpos($pattern, '(?<') && preg_match($pattern, $this->request->getUri(), $array)) {
+            $this->passed = $array; # Send Array To Method
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @throws Exception
      */
     public function run()
     {
-        # Check Valid Methods (GET | POST | ...) => Error 405 Method Not Allowed
-        if($this->invalidRequest($this->request)){
-            view('errors.405');
-            die();
-        }
-
-        # Check Valid Address => Error 404 Not Found
-        if(is_null($this->current_uri)){
-            view('errors.404');
-            die();
-        }
+        # Check HTTP Error
+        $this->invalidRequest($this->request);
 
         # Check DisPatch
         $this->disPatch($this->current_uri);
 
     }
-    private function invalidRequest(Request $request): bool # Check Method Allowed
+
+    private function invalidRequest(Request $request): void # Check Error
     {
-        foreach ($this->allRotes as $route)
-        {
-            if($route["url"] == $request->getUri()) {
-                if(!in_array($request->getMethod(), $route["method"])) return true;
-            }
+        # Check Valid Address => Error 404 Not Found
+        if(empty($this->current_uri)){
+            view('errors.404');
+            die();
         }
-        return false;
+        # Check Valid Methods (GET | POST | ...) => Error 405 Method Not Allowed
+        if (!in_array($request->getMethod(), $this->current_uri["method"])) {
+            view('errors.405');
+            die();
+        }
     }
 
     /**
@@ -75,35 +81,38 @@ class Router{
         $action = $patch["func"]; # Action Patch
         if (empty($action)) return; # Empty Return
 
-        if (is_string($action)){ # => 'HomeController@index'
+        if (is_string($action)) { # => 'HomeController@index'
             $action = explode('@', $action);
         }
 
-        if (is_array($action)){ # => ['HomeController', 'index']
+        if (is_array($action)) { # => ['HomeController', 'index']
             $class_name = self::HOME_CONTROLLER . $action[0];
             $method = $action[1];
-            if(!class_exists($class_name)){
+            if (!class_exists($class_name)) {
                 throw new Exception("(** Class : $class_name Not Existed **)");
             }
-            if(!method_exists($class_name, $method)){
+            if (!method_exists($class_name, $method)) {
                 throw new Exception("(** Method : $method in Class : $class_name Not Existed **)");
             }
             $controller = new $class_name();
-            $controller->{$method}();
+            $controller->{$method}($this->passed);
         }
 
-        if(is_callable($action)){ # => Closure Function
+        if (is_callable($action)) { # => Closure Function
             $action();
         }
     }
-    private function middleware_current_uri($middlewares){
-        foreach ($middlewares as $middleware){
+
+    private function middleware_current_uri($middlewares)
+    {
+        foreach ($middlewares as $middleware) {
             $middleware_obj = new $middleware;
             $middleware_obj->handler();
         }
     }
 
-    private function global_middleware(){
+    private function global_middleware()
+    {
         $glob = new BlockGlobal();
         $glob->handler();
     }
