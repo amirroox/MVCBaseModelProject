@@ -2,12 +2,13 @@
 namespace App\Core\Routing;
 
 use App\Core\Request;
+use App\Middleware\GlobalMiddle\BlockGlobal;
 use Exception;
 
 class Router{
-    private array $allRotes; // All Rotes In Project
-    private Request $request; // Request Users
-    private $current_uri; // Current URI For User
+    private array $allRotes;    // All Rotes In Project
+    private Request $request;   // Request Users
+    private $current_uri;       // Current URI For User
     const HOME_CONTROLLER = "App\Controller\\" ;
 
     public function __construct()
@@ -15,6 +16,9 @@ class Router{
         $this->request = new Request();
         $this->allRotes = Routs::getRouts();
         $this->current_uri = $this->findRoute($this->request) ?? null ;
+        # MiddleWare Handler
+        $this->global_middleware();
+        $this->middleware_current_uri($this->current_uri['middleware'] ?? []);
     }
 
     private function findRoute(Request $request)
@@ -29,6 +33,10 @@ class Router{
         # Route Not Excited
         return null;
     }
+
+    /**
+     * @throws Exception
+     */
     public function run()
     {
         # Check Valid Methods (GET | POST | ...) => Error 405 Method Not Allowed
@@ -87,5 +95,16 @@ class Router{
         if(is_callable($action)){ # => Closure Function
             $action();
         }
+    }
+    private function middleware_current_uri($middlewares){
+        foreach ($middlewares as $middleware){
+            $middleware_obj = new $middleware;
+            $middleware_obj->handler();
+        }
+    }
+
+    private function global_middleware(){
+        $glob = new BlockGlobal();
+        $glob->handler();
     }
 }
