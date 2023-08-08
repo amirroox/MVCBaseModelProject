@@ -11,3 +11,8 @@ try {
 } catch (Exception $e) {
     echo $e;
 }
+
+$user = new \App\Models\User();
+//var_dump($user->delete(13));
+var_dump($user->create(['id' => 65 , 'name' => "kids"]));
+//var_dump($user->create(['id' => 113 , 'name' => "You_113"]));

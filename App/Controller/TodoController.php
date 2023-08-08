@@ -10,7 +10,7 @@ class TodoController{
         view("test.list", $data);
     }
     public function post($post){
-        $slug = $post[1];
+        $slug = $post[1] ?? '';
         view("post.$slug.index");
     }
 }
