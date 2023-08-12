@@ -19,10 +19,10 @@ class JsonBaseModel extends BaseModel{
         }
         return 1;
     }
-    public function create(array $date): int
+    public function create(array $data): int
     {
         $json_array = $this->readJson();
-        $json_array[] = $date;
+        $json_array[] = $data;
         if($this->writeJson($json_array)){
             return 1;
         }
@@ -40,7 +40,7 @@ class JsonBaseModel extends BaseModel{
     {
         return (object)[];
     }
-    public function getAll(): array
+    public function readAll(): array
     {
         return $this->readJson();
     }

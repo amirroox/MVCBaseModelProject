@@ -1,8 +1,8 @@
 <?php
 namespace App\Models;
 
-use App\Models\Contracts\JsonBaseModel;
+use App\Models\Contracts\MySqlBaseModel;
 
-class User extends JsonBaseModel{
-    protected string $tableName = 'User';
+class User extends MySqlBaseModel {
+    protected string $tableName = 'Users';
 }

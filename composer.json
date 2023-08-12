@@ -17,6 +17,8 @@
     "require": {
         "vlucas/phpdotenv": "^5.5",
         "hisorange/browser-detect": "^4.5",
-      "ext-json": "*"
+      "ext-json": "*",
+      "ext-pdo": "*",
+        "catfan/medoo": "^2.1"
     }
 }
