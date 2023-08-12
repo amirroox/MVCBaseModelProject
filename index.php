@@ -11,7 +11,3 @@ try {
 } catch (Exception $e) {
     echo $e;
 }
-
-$user = new \App\Models\User();
-//var_dump($user->readAll());
-var_dump($user->readAll());
